@@ -1,2 +1,3 @@
+azure-storage-blob<13
 pandas<3
 pyodbc<6
