@@ -6,11 +6,13 @@ import pyodbc
 
 
 # Variables
+file_path = os.path.abspath(__file__)
+dir_path = os.path.dirname(file_path).rsplit("/", 1)[0]
+extract_path = dir_path + "/extracts/bdd_tables"
 sql_server = os.getenv("sql_server")
 bdd_name = os.getenv("bdd_name")
 username = os.getenv("username")
 password = os.getenv("password")
-
 schema_names = ("Production", "Sales", "Person")
 
 # Connexion à la BDD Azure
@@ -30,6 +32,8 @@ table_infos = cursor.fetchall()
 table_names = [table[0] for table in table_infos]
 
 # Récupération des tables
+table_errors = []
+
 for table in table_names:
         try:
             query = f"""SELECT * FROM {table}"""
@@ -37,10 +41,18 @@ for table in table_names:
             result = cursor.fetchall()
             col_names = [column[0] for column in cursor.description]
 
-            with open(f"extracts/bdd_tables/{table}.csv", "w", newline="") as csvfile:
+            with open(f"{extract_path}/{table}.csv", "w", newline="") as csvfile:
                 writer = csv.writer(csvfile, delimiter=",")
                 writer.writerow(col_names)
                 for row in result:
                     writer.writerow(row)
+
         except pyodbc.Error as e:
-            print(e)
+            table_errors.append([table, e])
+
+# Listes des tables non récupérées et des erreurs
+with open(f"{extract_path}/errors/errors.csv", "w", newline="") as csvfile:
+    writer = csv.writer(csvfile, delimiter=",")
+    writer.writerow(["Table", "Erreur"])
+    for error in table_errors:
+        writer.writerow(error)
