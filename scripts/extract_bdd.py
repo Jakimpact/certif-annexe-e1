@@ -9,6 +9,7 @@ import pyodbc
 file_path = os.path.abspath(__file__)
 dir_path = os.path.dirname(file_path).rsplit("/", 1)[0]
 extract_path = dir_path + "/extracts/bdd_tables"
+errors_path = extract_path + "/errors"
 sql_server = os.getenv("sql_server")
 bdd_name = os.getenv("bdd_name")
 username = os.getenv("username")
@@ -51,7 +52,8 @@ for table in table_names:
             table_errors.append([table, e])
 
 # Listes des tables non récupérées et des erreurs
-with open(f"{extract_path}/errors/errors.csv", "w", newline="") as csvfile:
+os.makedirs(errors_path, exist_ok=True)
+with open(f"{errors_path}/errors.csv", "w", newline="") as csvfile:
     writer = csv.writer(csvfile, delimiter=",")
     writer.writerow(["Table", "Erreur"])
     for error in table_errors:
