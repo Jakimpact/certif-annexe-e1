@@ -1,5 +1,9 @@
+cd "$(dirname "$0")"
+mkdir logs
+LOG_FILE="logs/run_log.log"
+
 log() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] $1"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] $1" >> $LOG_FILE
 }
 
 mkdir -p extracts/bdd_tables
